@@ -1,0 +1,519 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 218 25% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 218 25% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 25% 12%;
+
+    --primary: 216 57% 21%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 213 25% 94%;
+    --secondary-foreground: 216 40% 22%;
+
+    --muted: 213 22% 95%;
+    --muted-foreground: 214 12% 44%;
+
+    --accent: 199 72% 94%;
+    --accent-foreground: 216 57% 21%;
+
+    --destructive: 0 72% 44%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 20% 88%;
+    --input: 214 20% 86%;
+    --ring: 216 57% 30%;
+
+    /* Print palette — kept in sync with the exported PDF */
+    --navy: 216 57% 21%;
+    --navy-soft: 211 11% 43%;
+    --navy-rule: 215 20% 77%;
+
+    --radius: 0.6rem;
+
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+    /* ---------------------------------------------------------------------------
+     The portfolio document's look, as variables.
+
+     Declared on the root so a page *inherits* them: the workspace sets them on the container it draws pages
+     in, from the document's own theme (`lib/portfolioTheme.ts`), and a document with no theme never sets
+     them at all — which is why the values here are exactly what this composer has always drawn. The suite
+     pins these against the theme module, so the preview and the file cannot drift.
+     --------------------------------------------------------------------------- */
+    --proj-ink: #1c1f24;
+    --proj-navy: #172f54;
+    --proj-soft: #616c78;
+    --proj-accent: #0f766e;
+    --proj-rule: #c9d2de;
+    --proj-font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --proj-font-text: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /* The six type styles, on screen. The PDF's numbers are the same look in points — see SCREEN_SIZES. */
+    --proj-size-headline: 19px;
+    --proj-size-header: 12px;
+    --proj-size-subject: 12px;
+    --proj-size-title: 10px;
+    --proj-size-subhead: 10px;
+    --proj-size-label: 9px;
+}
+
+  .dark {
+    --background: 218 30% 8%;
+    --foreground: 210 25% 96%;
+
+    --card: 218 28% 11%;
+    --card-foreground: 210 25% 96%;
+
+    --popover: 218 28% 11%;
+    --popover-foreground: 210 25% 96%;
+
+    --primary: 212 78% 62%;
+    --primary-foreground: 218 40% 10%;
+
+    --secondary: 217 22% 18%;
+    --secondary-foreground: 210 25% 96%;
+
+    --muted: 217 22% 17%;
+    --muted-foreground: 214 16% 68%;
+
+    --accent: 214 45% 22%;
+    --accent-foreground: 210 30% 96%;
+
+    --destructive: 0 62% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 216 20% 22%;
+    --input: 216 20% 24%;
+    --ring: 212 78% 62%;
+
+    --navy: 212 60% 72%;
+    --navy-soft: 214 14% 70%;
+    --navy-rule: 216 18% 34%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Thin scrollbars inside the two workspace panes */
+  .scroll-pane {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scroll-pane::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .scroll-pane::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The ATS sheet
+   Rendered at true physical size (8.5in x 11in) with print margins baked in as
+   padding, so what is on screen is exactly what lands in the PDF. No icons and
+   no tables anywhere in the text blocks — the header row and job header rows
+   are plain block layout with float-right dates (tab-stop behaviour).
+   --------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   The portfolio page preview
+   The same rule as the ATS sheet above: hard-coded print colours, because a
+   page is white whatever the app theme is doing. Everything drawn *on* a page
+   uses one of these classes; anything editable sits outside the page or on an
+   opaque panel of its own.
+
+   Each one reads a variable rather than a literal, because the document has a
+   look of its own now (`lib/portfolioTheme.ts`): the workspace sets
+   `--proj-*` on the container it draws pages in, and the values in `:root` are
+   what a document with no theme — every document made before the look existed
+   — draws. The PDF reads the same numbers, so the drawing and the file agree.
+   --------------------------------------------------------------------------- */
+@layer components {
+  .proj-page {
+    background: #fff;
+    color: var(--proj-ink);
+    font-family: var(--proj-font-text);
+  }
+  .proj-page .proj-ink {
+    color: var(--proj-ink);
+  }
+  .proj-page .proj-navy {
+    color: var(--proj-navy);
+  }
+  .proj-page .proj-soft {
+    color: var(--proj-soft);
+  }
+  .proj-page .proj-accent {
+    color: var(--proj-accent);
+  }
+  .proj-page .proj-rule {
+    border-color: var(--proj-rule);
+  }
+  .proj-page .proj-empty {
+    background-color: #eef2f7;
+    box-shadow: inset 0 0 0 1px var(--proj-rule);
+  }
+
+  /* The six type styles on screen: a family and a size, both read from the variables, so a document's look
+     reaches the preview through the class list it always used. Unscoped on purpose — the style picker's own
+     samples sit on a panel, outside any page, and they have to be set in the style too. */
+  .proj-f-heading {
+    font-family: var(--proj-font-heading);
+  }
+  .proj-f-text {
+    font-family: var(--proj-font-text);
+  }
+  .proj-s-headline {
+    font-size: var(--proj-size-headline);
+  }
+  .proj-s-header {
+    font-size: var(--proj-size-header);
+  }
+  .proj-s-subject {
+    font-size: var(--proj-size-subject);
+  }
+  .proj-s-title {
+    font-size: var(--proj-size-title);
+  }
+  .proj-s-subhead {
+    font-size: var(--proj-size-subhead);
+  }
+  .proj-s-label {
+    font-size: var(--proj-size-label);
+  }
+
+  /* In-place editing on the page. The affordance is a hairline under the text that only appears
+     where editing is possible, plus a placeholder in the empty fields — nothing here reaches print:
+     the exported PDF is built from the document, not from this DOM. */
+  .proj-page [contenteditable="true"] {
+    outline: none;
+    border-radius: 2px;
+    box-shadow: inset 0 -1px 0 rgba(148, 163, 184, 0.45);
+  }
+  .proj-page [contenteditable="true"]:focus {
+    box-shadow: inset 0 -2px 0 #0f766e;
+  }
+  .proj-page [data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+    font-style: italic;
+  }
+}
+
+@layer components {
+  .sheet {
+    width: 8.5in;
+    height: 11in;
+    padding: 0.62in 0.75in 0.6in 0.75in;
+    background: #fff;
+    color: #1c1f24;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /* Every size below is expressed in em against this value, so the
+       "type size" dial scales the whole sheet proportionally. */
+    font-size: 9.3pt;
+    line-height: 1.26;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    position: relative;
+  }
+  /* Continuous mode: the sheet stops being a physical page. It keeps the same
+     typography and the same side margins, but its height follows the content, so
+     it can run onto as many printed pages as it needs and it never leaves dead
+     space at the end. Padding is symmetric top and bottom. */
+  .sheet--continuous {
+    height: auto;
+    min-height: 0;
+    padding-bottom: 0.62in;
+    overflow: visible;
+  }
+  .sheet header {
+    border-bottom: 0.9pt solid #172f54;
+    padding-bottom: 0.6452em;
+    margin-bottom: 0.4301em;
+  }
+  .sheet h1 {
+    margin: 0;
+    font-size: 2.1505em;
+    font-weight: 700;
+    color: #172f54;
+    letter-spacing: 0.4pt;
+  }
+  .sheet .headline {
+    margin: 0.3763em 0 0;
+    font-size: 1.0753em;
+    font-weight: 700;
+  }
+  .sheet .contact {
+    font-size: 0.9462em;
+    color: #616c78;
+    line-height: 1.24;
+  }
+  /* In-place editing affordance: the element's own typography is untouched, only
+     a faint dotted underline appears on hover so it reads as editable. Nothing
+     here reaches print — the print stylesheet neutralises it. */
+  .sheet .sheet-editable {
+    cursor: text;
+    outline: none;
+    border-radius: 2px;
+  }
+  /* Multiline fields (the summary paragraph) render real newlines without the
+     browser inserting block elements that would break the baseline grid. */
+  .sheet .sheet-editable--multiline {
+    white-space: pre-wrap;
+  }
+  .sheet .sheet-editable:hover {
+    box-shadow: inset 0 -1px 0 0 rgba(23, 47, 84, 0.28);
+  }
+  .sheet .sheet-editable:focus {
+    background: rgba(23, 47, 84, 0.06);
+    box-shadow: inset 0 -1px 0 0 rgba(23, 47, 84, 0.45);
+  }
+  .sheet .sheet-editable:empty::before {
+    content: attr(data-placeholder);
+    color: #9aa4b2;
+  }
+  .sheet .h2 {
+    font-size: 1.0753em;
+    font-weight: 700;
+    letter-spacing: 0.95pt;
+    text-transform: uppercase;
+    color: #172f54;
+    margin: 0.75em 0 0;
+    padding-bottom: 0.22em;
+    border-bottom: 0.55pt solid #b8c2d0;
+  }
+  .sheet .job {
+    font-size: 1.1075em;
+    font-weight: 700;
+    margin-top: 0.5914em;
+  }
+  .sheet .job .dates {
+    float: right;
+    font-size: 0.957em;
+    font-weight: 400;
+    color: #616c78;
+    white-space: nowrap;
+  }
+  .sheet .jobmeta {
+    font-size: 1em;
+    color: #616c78;
+    margin-top: 0.1075em;
+  }
+  .sheet .jobmeta .co {
+    font-weight: 700;
+  }
+  .sheet ul {
+    margin: 0.2581em 0 0;
+    padding-left: 1.3441em;
+    list-style: disc;
+  }
+  .sheet li {
+    margin-bottom: 0.2151em;
+  }
+  .sheet li::marker {
+    color: #172f54;
+  }
+  .sheet p {
+    margin: 0 0 0.4839em;
+  }
+  .sheet .kwd {
+    background: rgba(23, 47, 84, 0.08);
+    box-shadow: 0 0 0 1px rgba(23, 47, 84, 0.12);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+  /* Continuous layout: the sheet is unbounded, so resolve any breakable block to
+     the page it starts on rather than splitting it across pages. */
+  .sheet--continuous .job,
+  .sheet--continuous .jobmeta,
+  .sheet--continuous .h2 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .sheet--continuous li,
+  .sheet--continuous p {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .sheet-shell {
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.08),
+      0 12px 32px -12px rgba(15, 23, 42, 0.28);
+  }
+
+  /* -------------------------------------------------------------------------
+     Cover letter sheet
+     A different document with its own geometry — 1in margins and 10.5pt body on
+     1.45 leading, which is standard business-letter spacing. Same rules as the
+     resume: Helvetica, plain paragraphs, no graphics.
+     ------------------------------------------------------------------------- */
+  .letter-sheet {
+    width: 8.5in;
+    height: 11in;
+    padding: 1in 1in 1in 1in;
+    background: #fff;
+    color: #1c1f24;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    position: relative;
+    overflow: visible;
+  }
+  .letter-sheet .sender {
+    border-bottom: 0.9pt solid #172f54;
+    padding-bottom: 6pt;
+    margin-bottom: 18pt;
+  }
+  .letter-sheet .sender .name {
+    font-size: 15pt;
+    font-weight: 700;
+    color: #172f54;
+    letter-spacing: 0.3pt;
+  }
+  .letter-sheet .sender .contact {
+    font-size: 9pt;
+    color: #616c78;
+    margin-top: 2pt;
+  }
+  .letter-sheet .meta {
+    font-size: 9.5pt;
+    color: #616c78;
+    margin-bottom: 14pt;
+  }
+  .letter-sheet .salutation {
+    margin-bottom: 10pt;
+  }
+  .letter-sheet p.body {
+    margin: 0 0 10pt;
+    text-align: left;
+  }
+  .letter-sheet .closing {
+    margin-top: 16pt;
+  }
+  .letter-sheet .signature {
+    margin-top: 22pt;
+    font-weight: 700;
+  }
+}
+
+
+
+/* ---------------------------------------------------------------------------
+   PRINT ENGINE
+   One physical page. Everything except the sheet is removed from the flow, and
+   the sheet is pinned to the page corner. Ancestors of the sheet must be forced
+   back to `static` (the `print:static print:overflow-visible` utilities applied
+   in the workspace markup) so the absolute origin is the page, not a panel.
+   --------------------------------------------------------------------------- */
+@page {
+  size: letter;
+  margin: 0;
+}
+
+/* Continuous mode prints with real page margins so that *every* page gets the
+   same whitespace, not just the first and last, and the top and bottom match the
+   preview. The sheet drops its own padding (which only emulates margins on a
+   single page) and relies on the page box instead; content width is identical, so
+   line breaks match the preview exactly. Named pages are ignored by browsers that
+   do not support them, which degrades to the zero-margin rule above. */
+@page vdcm-continuous {
+  size: letter;
+  margin: 0.62in 0.75in;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-sheet,
+  .print-sheet * {
+    visibility: visible !important;
+  }
+
+  .print-sheet {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+    zoom: 1 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border: 0 !important;
+    overflow: visible !important;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  /* A continuous sheet stays in normal flow so the browser paginates it, and it
+     takes its margins from the page box rather than its own padding. Everything
+     else on the workspace is display:none, so it begins at the top of page 1. */
+  .print-sheet--continuous {
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    page: vdcm-continuous;
+  }
+
+  .sheet .kwd {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .sheet .sheet-editable {
+    background: transparent !important;
+    box-shadow: none !important;
+    cursor: auto !important;
+  }
+  .sheet .sheet-editable:empty::before {
+    content: "" !important;
+  }
+
+  .letter-sheet .sheet-editable {
+    background: transparent !important;
+    box-shadow: none !important;
+    cursor: auto !important;
+  }
+  .letter-sheet .sheet-editable:empty::before {
+    content: "" !important;
+  }
+  .letter-sheet .sheet-editable--multiline {
+    white-space: pre-wrap;
+  }
+}
+
